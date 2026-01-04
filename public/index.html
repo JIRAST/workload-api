@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Health Status</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f4f7f6; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; }
+        .status-ok { color: #2ecc71; font-weight: bold; }
+        .db-info { background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px; border-left: 4px solid #3498db; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Backend Status</h2>
+        <p>Status: <span id="status">กำลังตรวจสอบ...</span></p>
+        <div id="db-details" style="display: none;">
+            <p>Database: <span class="status-ok">Connected</span></p>
+            <div class="db-info">
+                <strong>Version:</strong><br>
+                <span id="version"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkHealth() {
+            try {
+                // ดึงข้อมูลจาก Go Server ที่คุณเพิ่งรันสำเร็จ
+                const response = await await fetch('/api/health');
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    document.getElementById('status').textContent = '✅ Online';
+                    document.getElementById('status').className = 'status-ok';
+                    document.getElementById('db-details').style.display = 'block';
+                    document.getElementById('version').textContent = data.version;
+                }
+            } catch (error) {
+                document.getElementById('status').textContent = '❌ Offline (โปรดรัน Go Server)';
+                document.getElementById('status').style.color = 'red';
+                console.error('Error:', error);
+            }
+        }
+
+        checkHealth();
+    </script>
+</body>
+</html>
